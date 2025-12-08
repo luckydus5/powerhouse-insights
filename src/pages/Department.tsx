@@ -1,18 +1,29 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useDepartments } from '@/hooks/useDepartments';
+import { useReports } from '@/hooks/useReports';
 import { KPICard } from '@/components/dashboard/KPICard';
+import { ReportsList } from '@/components/reports/ReportsList';
+import { CreateReportDialog } from '@/components/reports/CreateReportDialog';
 import { Plus, FileText, Users, CheckCircle, Clock } from 'lucide-react';
 
 export default function Department() {
   const { code } = useParams<{ code: string }>();
-  const { departments, loading } = useDepartments();
+  const { departments, loading: deptLoading } = useDepartments();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const department = departments.find(d => d.code.toLowerCase() === code?.toLowerCase());
+  const { reports, loading: reportsLoading } = useReports(department?.id);
 
-  if (loading) {
+  // Calculate stats from real data
+  const totalReports = reports.length;
+  const approvedReports = reports.filter(r => r.status === 'approved').length;
+  const pendingReports = reports.filter(r => ['pending', 'in_review'].includes(r.status)).length;
+
+  if (deptLoading) {
     return (
       <DashboardLayout title="Loading...">
         <div className="space-y-6">
@@ -49,7 +60,7 @@ export default function Department() {
             <h2 className="text-2xl font-bold text-foreground">{department.name}</h2>
             <p className="text-muted-foreground">{department.description}</p>
           </div>
-          <Button>
+          <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Report
           </Button>
@@ -59,28 +70,22 @@ export default function Department() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KPICard
             title="Total Reports"
-            value="24"
-            change={5}
-            changeLabel="this month"
+            value={totalReports.toString()}
             icon={<FileText className="h-5 w-5" />}
           />
           <KPICard
             title="Team Members"
-            value="12"
+            value="--"
             icon={<Users className="h-5 w-5" />}
           />
           <KPICard
             title="Approved"
-            value="18"
-            change={12}
-            changeLabel="from last month"
+            value={approvedReports.toString()}
             icon={<CheckCircle className="h-5 w-5" />}
           />
           <KPICard
             title="Pending"
-            value="6"
-            change={-3}
-            changeLabel="from last week"
+            value={pendingReports.toString()}
             icon={<Clock className="h-5 w-5" />}
           />
         </div>
@@ -89,23 +94,22 @@ export default function Department() {
         <Card className="shadow-corporate">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Department Reports</CardTitle>
-            <Button variant="outline" size="sm">View All</Button>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No reports yet</h3>
-              <p className="text-muted-foreground mb-4">
-                Be the first to create a report in this department
-              </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Report
-              </Button>
-            </div>
+            <ReportsList 
+              reports={reports} 
+              loading={reportsLoading}
+              onCreateClick={() => setCreateDialogOpen(true)}
+            />
           </CardContent>
         </Card>
       </div>
+
+      <CreateReportDialog 
+        open={createDialogOpen} 
+        onOpenChange={setCreateDialogOpen}
+        defaultDepartmentId={department.id}
+      />
     </DashboardLayout>
   );
 }
