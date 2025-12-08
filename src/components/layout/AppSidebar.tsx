@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronDown,
   Building2,
-  Zap
+  Zap,
+  UserCog
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -64,6 +65,7 @@ export function AppSidebar() {
     { title: 'Dashboard', url: '/', icon: LayoutDashboard },
     { title: 'My Reports', url: '/reports', icon: FileText },
     { title: 'Notifications', url: '/notifications', icon: Bell },
+    ...(highestRole === 'admin' ? [{ title: 'User Management', url: '/admin', icon: UserCog }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
