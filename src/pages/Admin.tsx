@@ -12,6 +12,7 @@ import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { useDepartments } from '@/hooks/useDepartments';
 import { supabase } from '@/integrations/supabase/client';
 import { UserPlus, Users, Shield } from 'lucide-react';
+import { UserList } from '@/components/admin/UserList';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Please enter a valid email address');
@@ -155,6 +156,9 @@ export default function Admin() {
             Create and manage user accounts
           </p>
         </div>
+
+        {/* User List */}
+        <UserList />
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Create User Form */}
