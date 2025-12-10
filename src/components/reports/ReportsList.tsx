@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Clock, ChevronRight } from 'lucide-react';
+import { FileText, Clock, ChevronRight, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import type { Tables } from '@/integrations/supabase/types';
+import { ReportDetailDialog } from './ReportDetailDialog';
 
 type Report = Tables<'reports'> & {
   departments?: {
@@ -18,6 +20,7 @@ interface ReportsListProps {
   reports: Report[];
   loading: boolean;
   onCreateClick: () => void;
+  onRefresh?: () => void;
 }
 
 const statusConfig = {
@@ -43,7 +46,19 @@ const typeLabels = {
   general: 'General',
 };
 
-export function ReportsList({ reports, loading, onCreateClick }: ReportsListProps) {
+export function ReportsList({ reports, loading, onCreateClick, onRefresh }: ReportsListProps) {
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  const handleReportClick = (report: Report) => {
+    setSelectedReport(report);
+    setDetailOpen(true);
+  };
+
+  const handleUpdate = () => {
+    onRefresh?.();
+  };
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -70,58 +85,74 @@ export function ReportsList({ reports, loading, onCreateClick }: ReportsListProp
   }
 
   return (
-    <div className="space-y-3">
-      {reports.map((report) => (
-        <Card 
-          key={report.id} 
-          className="hover:shadow-md transition-shadow cursor-pointer group"
-        >
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-medium text-foreground truncate">
-                    {report.title}
-                  </h4>
-                  <Badge 
-                    variant="outline" 
-                    className={cn('text-xs', statusConfig[report.status]?.className)}
-                  >
-                    {statusConfig[report.status]?.label}
-                  </Badge>
-                </div>
-                
-                <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                  {report.description || 'No description provided'}
-                </p>
-                
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
-                  </span>
-                  {report.departments && (
-                    <Badge variant="secondary" className="text-xs">
-                      {report.departments.name}
+    <>
+      <div className="space-y-3">
+        {reports.map((report) => (
+          <Card 
+            key={report.id} 
+            className="hover:shadow-md transition-shadow cursor-pointer group"
+            onClick={() => handleReportClick(report)}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-medium text-foreground truncate">
+                      {report.title}
+                    </h4>
+                    <Badge 
+                      variant="outline" 
+                      className={cn('text-xs', statusConfig[report.status]?.className)}
+                    >
+                      {statusConfig[report.status]?.label}
                     </Badge>
-                  )}
-                  <Badge variant="outline" className="text-xs">
-                    {typeLabels[report.report_type]}
-                  </Badge>
-                  <Badge 
-                    variant="outline" 
-                    className={cn('text-xs', priorityConfig[report.priority]?.className)}
-                  >
-                    {priorityConfig[report.priority]?.label}
-                  </Badge>
+                    {report.attachments && report.attachments.length > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Paperclip className="h-3 w-3" />
+                        {report.attachments.length}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+                    {report.description || 'No description provided'}
+                  </p>
+                  
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                    </span>
+                    {report.departments && (
+                      <Badge variant="secondary" className="text-xs">
+                        {report.departments.name}
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {typeLabels[report.report_type]}
+                    </Badge>
+                    <Badge 
+                      variant="outline" 
+                      className={cn('text-xs', priorityConfig[report.priority]?.className)}
+                    >
+                      {priorityConfig[report.priority]?.label}
+                    </Badge>
+                  </div>
                 </div>
+                
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
-              
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <ReportDetailDialog
+        report={selectedReport}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onUpdate={handleUpdate}
+      />
+    </>
   );
 }
