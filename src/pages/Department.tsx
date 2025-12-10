@@ -1,29 +1,35 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useReports } from '@/hooks/useReports';
+import { useUserRole } from '@/hooks/useUserRole';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { ReportsList } from '@/components/reports/ReportsList';
 import { CreateReportDialog } from '@/components/reports/CreateReportDialog';
-import { Plus, FileText, Users, CheckCircle, Clock } from 'lucide-react';
+import { Plus, FileText, Users, CheckCircle, Clock, ShieldAlert } from 'lucide-react';
 
 export default function Department() {
   const { code } = useParams<{ code: string }>();
   const { departments, loading: deptLoading } = useDepartments();
+  const { profile, hasRole, isInDepartment, loading: roleLoading } = useUserRole();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const department = departments.find(d => d.code.toLowerCase() === code?.toLowerCase());
-  const { reports, loading: reportsLoading } = useReports(department?.id);
+  const { reports, loading: reportsLoading, refetch } = useReports(department?.id);
+
+  // Check access: user must be admin, director, or in the department
+  const isAdmin = hasRole('admin') || hasRole('director');
+  const hasAccess = isAdmin || (department && isInDepartment(department.id));
 
   // Calculate stats from real data
   const totalReports = reports.length;
   const approvedReports = reports.filter(r => r.status === 'approved').length;
   const pendingReports = reports.filter(r => ['pending', 'in_review'].includes(r.status)).length;
 
-  if (deptLoading) {
+  if (deptLoading || roleLoading) {
     return (
       <DashboardLayout title="Loading...">
         <div className="space-y-6">
@@ -45,6 +51,25 @@ export default function Department() {
           <CardContent className="py-12 text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">Department not found</h3>
             <p className="text-muted-foreground">The requested department does not exist.</p>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
+  // Access denied
+  if (!hasAccess) {
+    return (
+      <DashboardLayout title="Access Denied">
+        <Card className="shadow-corporate border-destructive/20">
+          <CardContent className="py-12 text-center">
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Access Denied</h3>
+            <p className="text-muted-foreground">
+              You don't have permission to access the {department.name} department.
+              <br />
+              Contact an administrator if you need access.
+            </p>
           </CardContent>
         </Card>
       </DashboardLayout>
@@ -100,6 +125,7 @@ export default function Department() {
               reports={reports} 
               loading={reportsLoading}
               onCreateClick={() => setCreateDialogOpen(true)}
+              onRefresh={refetch}
             />
           </CardContent>
         </Card>
