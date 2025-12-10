@@ -257,14 +257,14 @@ export function UserList() {
             <div className="space-y-2">
               <Label htmlFor="edit-department">Department</Label>
               <Select
-                value={editForm.departmentId}
-                onValueChange={(value) => setEditForm((prev) => ({ ...prev, departmentId: value }))}
+                value={editForm.departmentId || 'none'}
+                onValueChange={(value) => setEditForm((prev) => ({ ...prev, departmentId: value === 'none' ? '' : value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No department</SelectItem>
+                  <SelectItem value="none">No department</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept.id} value={dept.id}>
                       {dept.name}
