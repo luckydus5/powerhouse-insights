@@ -8,7 +8,7 @@ import { ReportsList } from '@/components/reports/ReportsList';
 import { CreateReportDialog } from '@/components/reports/CreateReportDialog';
 
 export default function Reports() {
-  const { reports, loading } = useReports();
+  const { reports, loading, refetch } = useReports();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
@@ -42,6 +42,7 @@ export default function Reports() {
               reports={reports} 
               loading={loading}
               onCreateClick={() => setCreateDialogOpen(true)}
+              onRefresh={refetch}
             />
           </CardContent>
         </Card>
