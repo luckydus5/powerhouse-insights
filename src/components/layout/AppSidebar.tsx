@@ -58,14 +58,8 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const { signOut } = useAuth();
-  const { profile, highestRole, hasRole, isInDepartment } = useUserRole();
+  const { profile, highestRole } = useUserRole();
   const { departments } = useDepartments();
-
-  // Filter departments based on user access
-  const isAdmin = hasRole('admin') || hasRole('director');
-  const accessibleDepartments = isAdmin 
-    ? departments 
-    : departments.filter(d => isInDepartment(d.id));
 
   const mainNavItems = [
     { title: 'Dashboard', url: '/', icon: LayoutDashboard },
@@ -75,7 +69,7 @@ export function AppSidebar() {
   ];
 
   const isActive = (path: string) => location.pathname === path;
-  const isDepartmentActive = accessibleDepartments.some(d => location.pathname.includes(`/department/${d.code.toLowerCase()}`));
+  const isDepartmentActive = departments.some(d => location.pathname.includes(`/department/${d.code.toLowerCase()}`));
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -136,7 +130,7 @@ export function AppSidebar() {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {accessibleDepartments.map((dept) => {
+                  {departments.map((dept) => {
                     const Icon = departmentIcons[dept.code] || FileText;
                     const url = `/department/${dept.code.toLowerCase()}`;
                     return (
