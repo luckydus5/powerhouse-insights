@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { action, userId, role, departmentId, fullName } = await req.json();
+    const { action, userId, role, departmentId, fullName, departmentIds } = await req.json();
     console.log(`Managing user: action=${action}, userId=${userId}`);
 
     if (action === 'update') {
@@ -118,6 +118,93 @@ Deno.serve(async (req) => {
       console.log('User deleted successfully:', userId);
       return new Response(
         JSON.stringify({ success: true, message: 'User deleted successfully' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Grant additional department access
+    if (action === 'grant_department_access') {
+      const { error: grantError } = await supabaseAdmin
+        .from('user_department_access')
+        .insert({
+          user_id: userId,
+          department_id: departmentId,
+          granted_by: requestingUser.id,
+        });
+
+      if (grantError) {
+        // Check if it's a unique constraint violation
+        if (grantError.code === '23505') {
+          return new Response(
+            JSON.stringify({ error: 'User already has access to this department' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        console.error('Error granting department access:', grantError);
+        throw grantError;
+      }
+
+      console.log('Department access granted:', userId, departmentId);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Department access granted' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Revoke department access
+    if (action === 'revoke_department_access') {
+      const { error: revokeError } = await supabaseAdmin
+        .from('user_department_access')
+        .delete()
+        .eq('user_id', userId)
+        .eq('department_id', departmentId);
+
+      if (revokeError) {
+        console.error('Error revoking department access:', revokeError);
+        throw revokeError;
+      }
+
+      console.log('Department access revoked:', userId, departmentId);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Department access revoked' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Update multiple department accesses at once
+    if (action === 'update_department_access') {
+      // First, remove all existing additional access
+      const { error: deleteError } = await supabaseAdmin
+        .from('user_department_access')
+        .delete()
+        .eq('user_id', userId);
+
+      if (deleteError) {
+        console.error('Error clearing department access:', deleteError);
+        throw deleteError;
+      }
+
+      // Then add the new ones
+      if (departmentIds && departmentIds.length > 0) {
+        const accessRecords = departmentIds.map((deptId: string) => ({
+          user_id: userId,
+          department_id: deptId,
+          granted_by: requestingUser.id,
+        }));
+
+        const { error: insertError } = await supabaseAdmin
+          .from('user_department_access')
+          .insert(accessRecords);
+
+        if (insertError) {
+          console.error('Error inserting department access:', insertError);
+          throw insertError;
+        }
+      }
+
+      console.log('Department access updated:', userId, departmentIds);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Department access updated' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

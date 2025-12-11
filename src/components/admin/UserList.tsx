@@ -36,7 +36,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
-import { Pencil, Trash2, Users, Loader2, RefreshCw } from 'lucide-react';
+import { Pencil, Trash2, Users, Loader2, RefreshCw, Building2 } from 'lucide-react';
+import { DepartmentAccessDialog } from './DepartmentAccessDialog';
 
 const roleColors: Record<AppRole, string> = {
   admin: 'bg-destructive text-destructive-foreground',
@@ -62,6 +63,7 @@ export function UserList() {
 
   const [editingUser, setEditingUser] = useState<UserWithRole | null>(null);
   const [deletingUser, setDeletingUser] = useState<UserWithRole | null>(null);
+  const [accessUser, setAccessUser] = useState<UserWithRole | null>(null);
   const [editForm, setEditForm] = useState({
     fullName: '',
     role: 'staff' as AppRole,
@@ -194,6 +196,14 @@ export function UserList() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => setAccessUser(user)}
+                            title="Manage department access"
+                          >
+                            <Building2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleEditClick(user)}
                           >
                             <Pencil className="w-4 h-4" />
@@ -308,6 +318,14 @@ export function UserList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Department Access Dialog */}
+      <DepartmentAccessDialog
+        user={accessUser}
+        open={!!accessUser}
+        onOpenChange={() => setAccessUser(null)}
+        onSuccess={refetch}
+      />
     </>
   );
 }
