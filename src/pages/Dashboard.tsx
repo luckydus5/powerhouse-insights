@@ -2,6 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { RecentReports } from '@/components/dashboard/RecentReports';
 import { DepartmentOverview } from '@/components/dashboard/DepartmentOverview';
+import { GrantedDepartments } from '@/components/dashboard/GrantedDepartments';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useReportStats } from '@/hooks/useReportStats';
 import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -61,12 +62,13 @@ export default function Dashboard() {
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Recent Reports - Takes more space */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-6">
             <RecentReports />
           </div>
           
-          {/* Department Overview */}
-          <div className="lg:col-span-2">
+          {/* Right Sidebar - Department Overview + Granted Departments */}
+          <div className="lg:col-span-2 space-y-6">
+            <GrantedDepartments />
             <DepartmentOverview />
           </div>
         </div>
