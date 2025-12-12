@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FileText, Clock, ChevronRight, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,6 +14,12 @@ type Report = Tables<'reports'> & {
     name: string;
     code: string;
     color: string | null;
+  } | null;
+  created_by_profile?: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    avatar_url: string | null;
   } | null;
 };
 
@@ -119,6 +126,19 @@ export function ReportsList({ reports, loading, onCreateClick, onRefresh }: Repo
                   </p>
                   
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    {report.created_by_profile && (
+                      <span className="flex items-center gap-1.5">
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={report.created_by_profile.avatar_url || undefined} />
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                            {report.created_by_profile.full_name?.charAt(0) || report.created_by_profile.email.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="max-w-[100px] truncate">
+                          {report.created_by_profile.full_name || report.created_by_profile.email}
+                        </span>
+                      </span>
+                    )}
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}

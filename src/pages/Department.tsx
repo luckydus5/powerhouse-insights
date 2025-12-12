@@ -1,24 +1,27 @@
 import { useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useReports } from '@/hooks/useReports';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useDepartmentMembers } from '@/hooks/useDepartmentMembers';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { ReportsList } from '@/components/reports/ReportsList';
 import { CreateReportDialog } from '@/components/reports/CreateReportDialog';
+import { TeamMembersList } from '@/components/department/TeamMembersList';
 import { Plus, FileText, Users, CheckCircle, Clock, ShieldAlert } from 'lucide-react';
 
 export default function Department() {
   const { code } = useParams<{ code: string }>();
   const { departments, loading: deptLoading } = useDepartments();
-  const { profile, hasRole, isInDepartment, loading: roleLoading } = useUserRole();
+  const { hasRole, isInDepartment, loading: roleLoading } = useUserRole();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const department = departments.find(d => d.code.toLowerCase() === code?.toLowerCase());
   const { reports, loading: reportsLoading, refetch } = useReports(department?.id);
+  const { members, loading: membersLoading, count: teamCount } = useDepartmentMembers(department?.id);
 
   // Check access: user must be admin, director, or in the department
   const isAdmin = hasRole('admin') || hasRole('director');
@@ -100,7 +103,7 @@ export default function Department() {
           />
           <KPICard
             title="Team Members"
-            value="--"
+            value={membersLoading ? '...' : teamCount.toString()}
             icon={<Users className="h-5 w-5" />}
           />
           <KPICard
@@ -115,20 +118,30 @@ export default function Department() {
           />
         </div>
 
-        {/* Department Reports */}
-        <Card className="shadow-corporate">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Department Reports</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ReportsList 
-              reports={reports} 
-              loading={reportsLoading}
-              onCreateClick={() => setCreateDialogOpen(true)}
-              onRefresh={refetch}
-            />
-          </CardContent>
-        </Card>
+        {/* Main Content Grid */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Department Reports - Takes more space */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-corporate">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Department Reports</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReportsList 
+                  reports={reports} 
+                  loading={reportsLoading}
+                  onCreateClick={() => setCreateDialogOpen(true)}
+                  onRefresh={refetch}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Team Members List */}
+          <div className="lg:col-span-1">
+            <TeamMembersList members={members} loading={membersLoading} />
+          </div>
+        </div>
       </div>
 
       <CreateReportDialog 
