@@ -13,6 +13,12 @@ interface ReportWithDepartment extends Report {
     code: string;
     color: string | null;
   } | null;
+  created_by_profile?: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    avatar_url: string | null;
+  } | null;
 }
 
 export function useReports(departmentId?: string) {
@@ -45,10 +51,33 @@ export function useReports(departmentId?: string) {
         query = query.eq('department_id', departmentId);
       }
 
-      const { data, error } = await query;
+      const { data: reportsData, error } = await query;
 
       if (error) throw error;
-      setReports(data || []);
+
+      // Fetch profiles for report creators
+      const creatorIds = [...new Set((reportsData || []).map(r => r.created_by))];
+      
+      let profilesMap: Record<string, { id: string; full_name: string | null; email: string; avatar_url: string | null }> = {};
+      
+      if (creatorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, avatar_url')
+          .in('id', creatorIds);
+        
+        (profiles || []).forEach(p => {
+          profilesMap[p.id] = p;
+        });
+      }
+
+      // Combine reports with creator profiles
+      const reportsWithProfiles: ReportWithDepartment[] = (reportsData || []).map(report => ({
+        ...report,
+        created_by_profile: profilesMap[report.created_by] || null,
+      }));
+
+      setReports(reportsWithProfiles);
     } catch (error) {
       console.error('Error fetching reports:', error);
       toast.error('Failed to load reports');
