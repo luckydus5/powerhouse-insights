@@ -25,12 +25,14 @@ export function useUserRole() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [highestRole, setHighestRole] = useState<AppRole>('staff');
+  const [grantedDepartmentIds, setGrantedDepartmentIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) {
       setRoles([]);
       setProfile(null);
       setHighestRole('staff');
+      setGrantedDepartmentIds([]);
       setLoading(false);
       return;
     }
@@ -68,6 +70,15 @@ export function useUserRole() {
 
         if (profileError) throw profileError;
         setProfile(profileData);
+
+        // Fetch granted department access
+        const { data: accessData, error: accessError } = await supabase
+          .from('user_department_access')
+          .select('department_id')
+          .eq('user_id', user.id);
+
+        if (accessError) throw accessError;
+        setGrantedDepartmentIds((accessData || []).map(a => a.department_id));
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
@@ -90,7 +101,9 @@ export function useUserRole() {
   };
 
   const isInDepartment = (departmentId: string): boolean => {
-    return roles.some(r => r.department_id === departmentId);
+    // Check both user_roles department and granted department access
+    return roles.some(r => r.department_id === departmentId) || 
+           grantedDepartmentIds.includes(departmentId);
   };
 
   return {
@@ -101,5 +114,6 @@ export function useUserRole() {
     hasRole,
     hasMinRole,
     isInDepartment,
+    grantedDepartmentIds,
   };
 }
