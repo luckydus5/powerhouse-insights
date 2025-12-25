@@ -47,34 +47,93 @@ export type Database = {
         }
         Relationships: []
       }
-      fleets: {
+      fleet_issues: {
         Row: {
           created_at: string
-          department_id: string
-          fleet_number: string
+          fleet_id: string
           id: string
-          machine_type: string
-          operator_id: string | null
-          status: Database["public"]["Enums"]["fleet_status"]
+          is_resolved: boolean | null
+          issue_description: string
+          resolved_at: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
-          department_id: string
-          fleet_number: string
+          fleet_id: string
           id?: string
-          machine_type: string
-          operator_id?: string | null
-          status?: Database["public"]["Enums"]["fleet_status"]
+          is_resolved?: boolean | null
+          issue_description: string
+          resolved_at?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          fleet_id?: string
+          id?: string
+          is_resolved?: boolean | null
+          issue_description?: string
+          resolved_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_issues_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleets: {
+        Row: {
+          checked_by_name: string | null
+          condition: string | null
+          created_at: string
+          current_status: string | null
+          delivery_date: string | null
+          department_id: string
+          fleet_number: string
+          id: string
+          last_inspection_date: string | null
+          machine_hours: number | null
+          machine_type: string
+          operator_id: string | null
+          remarks: string | null
+          status: Database["public"]["Enums"]["fleet_status"]
+          updated_at: string
+        }
+        Insert: {
+          checked_by_name?: string | null
+          condition?: string | null
+          created_at?: string
+          current_status?: string | null
+          delivery_date?: string | null
+          department_id: string
+          fleet_number: string
+          id?: string
+          last_inspection_date?: string | null
+          machine_hours?: number | null
+          machine_type: string
+          operator_id?: string | null
+          remarks?: string | null
+          status?: Database["public"]["Enums"]["fleet_status"]
+          updated_at?: string
+        }
+        Update: {
+          checked_by_name?: string | null
+          condition?: string | null
+          created_at?: string
+          current_status?: string | null
+          delivery_date?: string | null
           department_id?: string
           fleet_number?: string
           id?: string
+          last_inspection_date?: string | null
+          machine_hours?: number | null
           machine_type?: string
           operator_id?: string | null
+          remarks?: string | null
           status?: Database["public"]["Enums"]["fleet_status"]
           updated_at?: string
         }
@@ -425,6 +484,13 @@ export type Database = {
     Enums: {
       app_role: "staff" | "supervisor" | "manager" | "director" | "admin"
       condition_type: "good" | "fair" | "poor"
+      fleet_condition:
+        | "operational"
+        | "good_condition"
+        | "grounded"
+        | "under_repair"
+        | "waiting_parts"
+        | "decommissioned"
       fleet_status: "operational" | "under_maintenance" | "out_of_service"
       report_priority: "low" | "medium" | "high" | "critical"
       report_status:
@@ -565,6 +631,14 @@ export const Constants = {
     Enums: {
       app_role: ["staff", "supervisor", "manager", "director", "admin"],
       condition_type: ["good", "fair", "poor"],
+      fleet_condition: [
+        "operational",
+        "good_condition",
+        "grounded",
+        "under_repair",
+        "waiting_parts",
+        "decommissioned",
+      ],
       fleet_status: ["operational", "under_maintenance", "out_of_service"],
       report_priority: ["low", "medium", "high", "critical"],
       report_status: [
