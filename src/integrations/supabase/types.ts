@@ -47,6 +47,125 @@ export type Database = {
         }
         Relationships: []
       }
+      fleets: {
+        Row: {
+          created_at: string
+          department_id: string
+          fleet_number: string
+          id: string
+          machine_type: string
+          operator_id: string | null
+          status: Database["public"]["Enums"]["fleet_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department_id: string
+          fleet_number: string
+          id?: string
+          machine_type: string
+          operator_id?: string | null
+          status?: Database["public"]["Enums"]["fleet_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string
+          fleet_number?: string
+          id?: string
+          machine_type?: string
+          operator_id?: string | null
+          status?: Database["public"]["Enums"]["fleet_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleets_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_records: {
+        Row: {
+          checked_by: string | null
+          condition_after_service:
+            | Database["public"]["Enums"]["condition_type"]
+            | null
+          created_at: string
+          current_status: string | null
+          delivery_time_hours: number | null
+          department_id: string
+          fleet_id: string
+          id: string
+          machine_hours: number | null
+          maintenance_date: string
+          next_service_due: string | null
+          operator_id: string | null
+          remarks: string | null
+          service_description: string
+          service_type: Database["public"]["Enums"]["service_type"]
+          updated_at: string
+        }
+        Insert: {
+          checked_by?: string | null
+          condition_after_service?:
+            | Database["public"]["Enums"]["condition_type"]
+            | null
+          created_at?: string
+          current_status?: string | null
+          delivery_time_hours?: number | null
+          department_id: string
+          fleet_id: string
+          id?: string
+          machine_hours?: number | null
+          maintenance_date: string
+          next_service_due?: string | null
+          operator_id?: string | null
+          remarks?: string | null
+          service_description: string
+          service_type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Update: {
+          checked_by?: string | null
+          condition_after_service?:
+            | Database["public"]["Enums"]["condition_type"]
+            | null
+          created_at?: string
+          current_status?: string | null
+          delivery_time_hours?: number | null
+          department_id?: string
+          fleet_id?: string
+          id?: string
+          machine_hours?: number | null
+          maintenance_date?: string
+          next_service_due?: string | null
+          operator_id?: string | null
+          remarks?: string | null
+          service_description?: string
+          service_type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -305,6 +424,8 @@ export type Database = {
     }
     Enums: {
       app_role: "staff" | "supervisor" | "manager" | "director" | "admin"
+      condition_type: "good" | "fair" | "poor"
+      fleet_status: "operational" | "under_maintenance" | "out_of_service"
       report_priority: "low" | "medium" | "high" | "critical"
       report_status:
         | "draft"
@@ -314,6 +435,7 @@ export type Database = {
         | "rejected"
         | "escalated"
       report_type: "incident" | "financial" | "performance" | "general"
+      service_type: "preventive" | "corrective" | "breakdown"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -442,6 +564,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["staff", "supervisor", "manager", "director", "admin"],
+      condition_type: ["good", "fair", "poor"],
+      fleet_status: ["operational", "under_maintenance", "out_of_service"],
       report_priority: ["low", "medium", "high", "critical"],
       report_status: [
         "draft",
@@ -452,6 +576,7 @@ export const Constants = {
         "escalated",
       ],
       report_type: ["incident", "financial", "performance", "general"],
+      service_type: ["preventive", "corrective", "breakdown"],
     },
   },
 } as const

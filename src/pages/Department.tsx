@@ -11,6 +11,7 @@ import { KPICard } from '@/components/dashboard/KPICard';
 import { ReportsList } from '@/components/reports/ReportsList';
 import { CreateReportDialog } from '@/components/reports/CreateReportDialog';
 import { TeamMembersList } from '@/components/department/TeamMembersList';
+import { FleetMaintenanceDashboard } from '@/components/fleet/FleetMaintenanceDashboard';
 import { Plus, FileText, Users, CheckCircle, Clock, ShieldAlert } from 'lucide-react';
 
 export default function Department() {
@@ -25,12 +26,16 @@ export default function Department() {
 
   // Check access: user must be admin, director, or in the department
   const isAdmin = hasRole('admin') || hasRole('director');
+  const canManage = hasRole('admin') || hasRole('director') || hasRole('supervisor') || hasRole('manager');
   const hasAccess = isAdmin || (department && isInDepartment(department.id));
 
   // Calculate stats from real data
   const totalReports = reports.length;
   const approvedReports = reports.filter(r => r.status === 'approved').length;
   const pendingReports = reports.filter(r => ['pending', 'in_review'].includes(r.status)).length;
+
+  // Check if this is the PEAT department
+  const isPeatDepartment = department?.code?.toUpperCase() === 'PEAT';
 
   if (deptLoading || roleLoading) {
     return (
@@ -79,6 +84,16 @@ export default function Department() {
     );
   }
 
+  // Render Fleet Maintenance Dashboard for PEAT department
+  if (isPeatDepartment) {
+    return (
+      <DashboardLayout title={department.name}>
+        <FleetMaintenanceDashboard department={department} canManage={canManage} />
+      </DashboardLayout>
+    );
+  }
+
+  // Default department view for other departments
   return (
     <DashboardLayout title={department.name}>
       <div className="space-y-6 animate-fade-in">
