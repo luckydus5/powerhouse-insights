@@ -1,6 +1,6 @@
 -- ============================================
 -- HQ Power - Complete Database Schema Export
--- Generated: 2024-12-25
+-- Generated: 2024-12-25 (Updated with fleet_issues)
 -- ============================================
 -- Run this file in your Supabase SQL Editor to recreate the entire database structure
 
@@ -10,6 +10,7 @@
 
 CREATE TYPE public.app_role AS ENUM ('staff', 'supervisor', 'manager', 'director', 'admin');
 CREATE TYPE public.fleet_status AS ENUM ('operational', 'under_maintenance', 'out_of_service');
+CREATE TYPE public.fleet_condition AS ENUM ('operational', 'good_condition', 'grounded', 'under_repair', 'waiting_parts', 'decommissioned');
 CREATE TYPE public.report_status AS ENUM ('draft', 'submitted', 'in_review', 'resolved', 'closed');
 CREATE TYPE public.report_type AS ENUM ('general', 'incident', 'maintenance', 'safety', 'compliance');
 CREATE TYPE public.report_priority AS ENUM ('low', 'medium', 'high', 'critical');
@@ -64,7 +65,7 @@ CREATE TABLE public.user_department_access (
   UNIQUE (user_id, department_id)
 );
 
--- Fleets table
+-- Fleets table (updated with new fields)
 CREATE TABLE public.fleets (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   fleet_number VARCHAR NOT NULL,
@@ -72,9 +73,27 @@ CREATE TABLE public.fleets (
   status public.fleet_status NOT NULL DEFAULT 'operational',
   operator_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   department_id UUID NOT NULL REFERENCES public.departments(id) ON DELETE CASCADE,
+  delivery_date DATE,
+  machine_hours INTEGER DEFAULT 0,
+  current_status TEXT,
+  condition TEXT DEFAULT 'operational',
+  remarks TEXT,
+  checked_by_name TEXT,
+  last_inspection_date DATE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   UNIQUE (department_id, fleet_number)
+);
+
+-- Fleet issues table (for tracking multiple issues per fleet)
+CREATE TABLE public.fleet_issues (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  fleet_id UUID NOT NULL REFERENCES public.fleets(id) ON DELETE CASCADE,
+  issue_description TEXT NOT NULL,
+  is_resolved BOOLEAN DEFAULT false,
+  resolved_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- Maintenance records table
@@ -145,6 +164,7 @@ CREATE TABLE public.notifications (
 CREATE INDEX idx_fleets_department_id ON public.fleets(department_id);
 CREATE INDEX idx_fleets_status ON public.fleets(status);
 CREATE INDEX idx_fleets_operator_id ON public.fleets(operator_id);
+CREATE INDEX idx_fleet_issues_fleet_id ON public.fleet_issues(fleet_id);
 CREATE INDEX idx_maintenance_records_fleet_id ON public.maintenance_records(fleet_id);
 CREATE INDEX idx_maintenance_records_department_id ON public.maintenance_records(department_id);
 CREATE INDEX idx_maintenance_records_maintenance_date ON public.maintenance_records(maintenance_date);
@@ -276,6 +296,10 @@ CREATE TRIGGER update_fleets_updated_at
   BEFORE UPDATE ON public.fleets
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE TRIGGER update_fleet_issues_updated_at
+  BEFORE UPDATE ON public.fleet_issues
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 CREATE TRIGGER update_maintenance_records_updated_at
   BEFORE UPDATE ON public.maintenance_records
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -293,6 +317,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_department_access ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fleets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_issues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.maintenance_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.report_comments ENABLE ROW LEVEL SECURITY;
@@ -385,6 +410,78 @@ CREATE POLICY "Supervisors+ can update fleets"
     ))
     OR has_role(auth.uid(), 'admin')
     OR has_role(auth.uid(), 'director')
+  );
+
+-- FLEET ISSUES POLICIES
+CREATE POLICY "Users in department can view fleet issues"
+  ON public.fleet_issues FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.fleets f
+      WHERE f.id = fleet_issues.fleet_id
+      AND (
+        user_in_department(auth.uid(), f.department_id)
+        OR has_role(auth.uid(), 'admin')
+        OR has_role(auth.uid(), 'director')
+      )
+    )
+  );
+
+CREATE POLICY "Supervisors+ can create fleet issues"
+  ON public.fleet_issues FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.fleets f
+      WHERE f.id = fleet_issues.fleet_id
+      AND (
+        (user_in_department(auth.uid(), f.department_id) AND (
+          has_role(auth.uid(), 'supervisor') OR
+          has_role(auth.uid(), 'manager') OR
+          has_role(auth.uid(), 'director') OR
+          has_role(auth.uid(), 'admin')
+        ))
+        OR has_role(auth.uid(), 'admin')
+        OR has_role(auth.uid(), 'director')
+      )
+    )
+  );
+
+CREATE POLICY "Supervisors+ can update fleet issues"
+  ON public.fleet_issues FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.fleets f
+      WHERE f.id = fleet_issues.fleet_id
+      AND (
+        (user_in_department(auth.uid(), f.department_id) AND (
+          has_role(auth.uid(), 'supervisor') OR
+          has_role(auth.uid(), 'manager') OR
+          has_role(auth.uid(), 'director') OR
+          has_role(auth.uid(), 'admin')
+        ))
+        OR has_role(auth.uid(), 'admin')
+        OR has_role(auth.uid(), 'director')
+      )
+    )
+  );
+
+CREATE POLICY "Supervisors+ can delete fleet issues"
+  ON public.fleet_issues FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.fleets f
+      WHERE f.id = fleet_issues.fleet_id
+      AND (
+        (user_in_department(auth.uid(), f.department_id) AND (
+          has_role(auth.uid(), 'supervisor') OR
+          has_role(auth.uid(), 'manager') OR
+          has_role(auth.uid(), 'director') OR
+          has_role(auth.uid(), 'admin')
+        ))
+        OR has_role(auth.uid(), 'admin')
+        OR has_role(auth.uid(), 'director')
+      )
+    )
   );
 
 -- MAINTENANCE RECORDS POLICIES
@@ -494,19 +591,6 @@ CREATE POLICY "Users can view attachments for reports they can see"
     bucket_id = 'report-attachments'
     AND auth.role() = 'authenticated'
   );
-
--- ============================================
--- 9. SAMPLE DATA (OPTIONAL)
--- ============================================
-
--- Uncomment and run this section to add sample departments
-/*
-INSERT INTO public.departments (name, code, description, icon, color) VALUES
-  ('Peat Maintenance', 'PEAT', 'Peat extraction and maintenance operations', 'Wrench', 'blue'),
-  ('Logistics', 'LOG', 'Transportation and logistics management', 'Truck', 'green'),
-  ('Operations', 'OPS', 'General operations and administration', 'Settings', 'purple'),
-  ('Safety', 'SAFE', 'Health and safety compliance', 'Shield', 'red');
-*/
 
 -- ============================================
 -- END OF SCHEMA EXPORT

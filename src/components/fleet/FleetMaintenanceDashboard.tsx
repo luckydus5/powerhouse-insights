@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Wrench, Truck } from 'lucide-react';
+import { Plus, Wrench, Truck, FileDown } from 'lucide-react';
 import { useFleets } from '@/hooks/useFleets';
 import { useMaintenanceRecords } from '@/hooks/useMaintenanceRecords';
 import { FleetKPICards } from './FleetKPICards';
@@ -11,6 +11,7 @@ import { RecentActivity } from './RecentActivity';
 import { AddFleetDialog } from './AddFleetDialog';
 import { AddMaintenanceDialog } from './AddMaintenanceDialog';
 import { Department } from '@/hooks/useDepartments';
+import { format } from 'date-fns';
 
 interface FleetMaintenanceDashboardProps {
   department: Department;
@@ -40,8 +41,12 @@ export function FleetMaintenanceDashboard({ department, canManage }: FleetMainte
   const handleAddMaintenance = async (data: any) => {
     await createRecord(data);
     refetchMaintenance();
-    refetchFleets(); // Refresh to update last maintenance info
+    refetchFleets();
   };
+
+  // Get the most common checked_by from fleets
+  const checkedBy = fleets.find(f => f.checked_by_name)?.checked_by_name || 'Jimmy';
+  const inspectionDate = format(new Date(), 'dd/MM/yyyy');
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -70,15 +75,24 @@ export function FleetMaintenanceDashboard({ department, canManage }: FleetMainte
 
       {/* KPI Cards */}
       <FleetKPICards
+        total={stats.total}
         operational={stats.operational}
         underMaintenance={stats.underMaintenance}
         outOfService={stats.outOfService}
+        waitingParts={stats.waitingParts}
+        withIssues={stats.withIssues}
         servicesThisMonth={servicesThisMonth}
         loading={fleetsLoading || maintenanceLoading}
       />
 
       {/* Fleet Overview Table */}
-      <FleetOverviewTable fleets={fleets} loading={fleetsLoading} />
+      <FleetOverviewTable 
+        fleets={fleets} 
+        loading={fleetsLoading}
+        title={`HQ PEAT INSPECTION FOR ${department.name.toUpperCase()}`}
+        checkedBy={checkedBy}
+        inspectionDate={inspectionDate}
+      />
 
       {/* Two Column Layout for Current/Upcoming */}
       <div className="grid gap-6 lg:grid-cols-2">
