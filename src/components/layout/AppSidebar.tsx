@@ -83,7 +83,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="font-semibold text-sidebar-foreground">ElectraCorp</span>
+              <span className="font-semibold text-sidebar-foreground">HQ Power</span>
               <span className="text-xs text-sidebar-foreground/60">Enterprise Dashboard</span>
             </div>
           )}
