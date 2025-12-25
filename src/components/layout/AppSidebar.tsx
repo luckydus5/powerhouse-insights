@@ -42,6 +42,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+import { Truck } from 'lucide-react';
+
 const departmentIcons: Record<string, typeof DollarSign> = {
   'FIN': DollarSign,
   'SAF': Shield,
@@ -51,6 +53,7 @@ const departmentIcons: Record<string, typeof DollarSign> = {
   'IT': Monitor,
   'CS': Headphones,
   'ENG': Wrench,
+  'PEAT': Truck,
 };
 
 export function AppSidebar() {
