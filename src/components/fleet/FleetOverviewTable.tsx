@@ -19,6 +19,9 @@ import { Fleet, FleetStatus } from '@/hooks/useFleets';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronDown, ChevronRight, AlertTriangle, CheckCircle2, Clock, Wrench } from 'lucide-react';
+import { FleetInlineEdit } from './FleetInlineEdit';
+import { useFleetAudit } from '@/hooks/useFleetAudit';
+import { toast } from 'sonner';
 
 interface FleetOverviewTableProps {
   fleets: Fleet[];
@@ -26,7 +29,17 @@ interface FleetOverviewTableProps {
   title?: string;
   checkedBy?: string;
   inspectionDate?: string;
+  onRefetch?: () => void;
 }
+
+const CONDITION_OPTIONS = [
+  { value: 'operational', label: 'Operational' },
+  { value: 'good_condition', label: 'Good Condition' },
+  { value: 'under_repair', label: 'Under Repair' },
+  { value: 'waiting_parts', label: 'Waiting Parts' },
+  { value: 'grounded', label: 'Grounded' },
+  { value: 'decommissioned', label: 'Out of Service' },
+];
 
 const getConditionBadge = (fleet: Fleet) => {
   const condition = fleet.condition || fleet.status;
@@ -61,9 +74,11 @@ export function FleetOverviewTable({
   loading, 
   title = "HQ PEAT INSPECTION FOR VALTRA TRACTORS",
   checkedBy,
-  inspectionDate 
+  inspectionDate,
+  onRefetch
 }: FleetOverviewTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const { updateFleetWithAudit, resolveIssueWithAudit } = useFleetAudit();
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
@@ -73,6 +88,28 @@ export function FleetOverviewTable({
       newExpanded.add(id);
     }
     setExpandedRows(newExpanded);
+  };
+
+  const handleUpdateField = async (fleetId: string, field: string, oldValue: string | number | null, newValue: string) => {
+    try {
+      const parsedValue = field === 'machine_hours' ? parseInt(newValue) || 0 : newValue;
+      await updateFleetWithAudit(fleetId, field, oldValue, parsedValue);
+      toast.success(`${field.replace('_', ' ')} updated successfully`);
+      onRefetch?.();
+    } catch (error) {
+      toast.error('Failed to update field');
+      throw error;
+    }
+  };
+
+  const handleResolveIssue = async (issueId: string, fleetId: string, description: string) => {
+    try {
+      await resolveIssueWithAudit(issueId, fleetId, description);
+      toast.success('Issue marked as resolved');
+      onRefetch?.();
+    } catch (error) {
+      toast.error('Failed to resolve issue');
+    }
   };
 
   if (loading) {
@@ -173,7 +210,12 @@ export function FleetOverviewTable({
                               : '-'}
                           </TableCell>
                           <TableCell className="text-right font-mono">
-                            {fleet.machine_hours?.toLocaleString() || '-'}
+                            <FleetInlineEdit
+                              value={fleet.machine_hours}
+                              type="number"
+                              onSave={(val) => handleUpdateField(fleet.id, 'machine_hours', fleet.machine_hours, val)}
+                              placeholder="-"
+                            />
                           </TableCell>
                           <TableCell>
                             {hasIssues ? (
@@ -189,28 +231,48 @@ export function FleetOverviewTable({
                             )}
                           </TableCell>
                           <TableCell>
-                            <Badge className={badge.className}>
-                              {badge.label}
-                            </Badge>
+                            <FleetInlineEdit
+                              value={fleet.condition || 'operational'}
+                              type="select"
+                              options={CONDITION_OPTIONS}
+                              onSave={(val) => handleUpdateField(fleet.id, 'condition', fleet.condition, val)}
+                            />
                           </TableCell>
-                          <TableCell className="max-w-[200px] text-muted-foreground text-sm">
-                            {fleet.remarks || '-'}
+                          <TableCell className="max-w-[200px]">
+                            <FleetInlineEdit
+                              value={fleet.remarks}
+                              type="text"
+                              onSave={(val) => handleUpdateField(fleet.id, 'remarks', fleet.remarks, val)}
+                              placeholder="-"
+                              className="text-muted-foreground text-sm"
+                            />
                           </TableCell>
                         </TableRow>
                         {hasIssues && (
                           <CollapsibleContent asChild>
                             <TableRow className="bg-amber-50/50 dark:bg-amber-950/20">
                               <TableCell colSpan={9} className="py-3 px-8">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                   <p className="font-medium text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
                                     <Wrench className="h-4 w-4" />
                                     Issues requiring attention:
                                   </p>
-                                  <ul className="list-none space-y-1 ml-6">
+                                  <ul className="list-none space-y-2 ml-6">
                                     {fleet.issues?.map((issue, i) => (
-                                      <li key={issue.id} className="text-sm text-muted-foreground flex items-start gap-2">
-                                        <span className="font-medium text-foreground">{i + 1}.</span>
-                                        {issue.issue_description}
+                                      <li key={issue.id} className="text-sm text-muted-foreground flex items-center justify-between gap-4 group">
+                                        <div className="flex items-start gap-2">
+                                          <span className="font-medium text-foreground">{i + 1}.</span>
+                                          <span>{issue.issue_description}</span>
+                                        </div>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                          onClick={() => handleResolveIssue(issue.id, fleet.id, issue.issue_description)}
+                                        >
+                                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                                          Mark Resolved
+                                        </Button>
                                       </li>
                                     ))}
                                   </ul>
