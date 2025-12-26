@@ -92,6 +92,7 @@ export function FleetMaintenanceDashboard({ department, canManage }: FleetMainte
         title={`HQ PEAT INSPECTION FOR ${department.name.toUpperCase()}`}
         checkedBy={checkedBy}
         inspectionDate={inspectionDate}
+        onRefetch={refetchFleets}
       />
 
       {/* Two Column Layout for Current/Upcoming */}
