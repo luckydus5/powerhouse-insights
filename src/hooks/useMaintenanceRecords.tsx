@@ -107,19 +107,39 @@ export function useMaintenanceRecords(departmentId?: string) {
     remarks?: string;
     checked_by?: string;
     next_service_due?: string;
+    issues?: string[];
   }) => {
     if (!departmentId) throw new Error('Department ID required');
+
+    const { issues, ...recordData } = data;
 
     const { data: newRecord, error } = await supabase
       .from('maintenance_records')
       .insert({
-        ...data,
+        ...recordData,
         department_id: departmentId
       })
       .select()
       .single();
 
     if (error) throw error;
+
+    // Insert issues if provided
+    if (issues && issues.length > 0) {
+      const issueInserts = issues.map(issue => ({
+        fleet_id: data.fleet_id,
+        issue_description: issue
+      }));
+
+      const { error: issuesError } = await supabase
+        .from('fleet_issues')
+        .insert(issueInserts);
+
+      if (issuesError) {
+        console.error('Failed to insert issues:', issuesError);
+      }
+    }
+
     await fetchRecords();
     return newRecord;
   };

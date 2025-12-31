@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Fleet } from '@/hooks/useFleets';
 import { ServiceType, ConditionType } from '@/hooks/useMaintenanceRecords';
 import { format } from 'date-fns';
+import { Plus, X } from 'lucide-react';
 
 interface AddMaintenanceDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ interface AddMaintenanceDialogProps {
     current_status?: string;
     remarks?: string;
     next_service_due?: string;
+    issues?: string[];
   }) => Promise<void>;
 }
 
@@ -42,6 +44,21 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
   const [currentStatus, setCurrentStatus] = useState('');
   const [remarks, setRemarks] = useState('');
   const [nextServiceDue, setNextServiceDue] = useState('');
+  const [issues, setIssues] = useState<string[]>(['']);
+
+  const addIssueField = () => {
+    setIssues([...issues, '']);
+  };
+
+  const removeIssueField = (index: number) => {
+    setIssues(issues.filter((_, i) => i !== index));
+  };
+
+  const updateIssue = (index: number, value: string) => {
+    const newIssues = [...issues];
+    newIssues[index] = value;
+    setIssues(newIssues);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +72,9 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
       return;
     }
 
+    // Filter out empty issues
+    const validIssues = issues.filter(issue => issue.trim() !== '');
+
     try {
       setLoading(true);
       await onSubmit({
@@ -67,13 +87,14 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
         condition_after_service: conditionAfterService,
         current_status: currentStatus.trim() || undefined,
         remarks: remarks.trim() || undefined,
-        next_service_due: nextServiceDue || undefined
+        next_service_due: nextServiceDue || undefined,
+        issues: validIssues.length > 0 ? validIssues : undefined
       });
       
       const fleet = fleets.find(f => f.id === fleetId);
       toast({
         title: 'Maintenance Recorded',
-        description: `Service for ${fleet?.fleet_number || 'fleet'} has been logged`
+        description: `Service for ${fleet?.fleet_number || 'fleet'} has been logged${validIssues.length > 0 ? ` with ${validIssues.length} issue(s)` : ''}`
       });
       
       // Reset form
@@ -87,6 +108,7 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
       setCurrentStatus('');
       setRemarks('');
       setNextServiceDue('');
+      setIssues(['']);
       onOpenChange(false);
     } catch (error: any) {
       toast({
@@ -101,7 +123,7 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record Maintenance</DialogTitle>
         </DialogHeader>
@@ -216,6 +238,50 @@ export function AddMaintenanceDialog({ open, onOpenChange, fleets, onSubmit }: A
                   onChange={(e) => setCurrentStatus(e.target.value)}
                 />
               </div>
+            </div>
+
+            {/* Issues Section */}
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label>Issues Found (Optional)</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={addIssueField}
+                  className="h-7 text-xs"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Issue
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-[150px] overflow-y-auto">
+                {issues.map((issue, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground w-6">{index + 1}.</span>
+                    <Input
+                      value={issue}
+                      onChange={(e) => updateIssue(index, e.target.value)}
+                      placeholder="Describe the issue..."
+                      className="flex-1"
+                    />
+                    {issues.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeIssueField(index)}
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Add issues found during inspection. These will appear as numbered items in the fleet table.
+              </p>
             </div>
 
             <div className="grid gap-2">
