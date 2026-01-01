@@ -2,119 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Corporate Professional Design System for Electricity Company Dashboard */
+/* HQ Power - Professional Energy Company Design System */
 
 @layer base {
   :root {
-    /* Corporate Blue Theme */
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* HQ Power Brand Colors */
+    --background: 45 30% 97%;
+    --foreground: 160 40% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 160 40% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 160 40% 15%;
 
-    /* Primary - Corporate Blue */
-    --primary: 215 70% 45%;
+    /* Primary - HQ Power Green */
+    --primary: 160 65% 35%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Slate */
-    --secondary: 215 15% 92%;
-    --secondary-foreground: 215 25% 25%;
+    /* Secondary - Golden Yellow (Sun rays) */
+    --secondary: 45 95% 55%;
+    --secondary-foreground: 160 40% 15%;
 
-    --muted: 215 15% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 45 20% 94%;
+    --muted-foreground: 160 20% 45%;
 
-    /* Accent - Electric Blue */
-    --accent: 200 85% 50%;
+    /* Accent - Sky Blue (Sunrise) */
+    --accent: 200 75% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     /* Status colors */
-    --success: 142 70% 45%;
+    --success: 160 65% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --info: 200 85% 50%;
+    --warning: 45 95% 50%;
+    --warning-foreground: 160 40% 15%;
+    --info: 200 75% 50%;
     --info-foreground: 0 0% 100%;
 
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
-    --ring: 215 70% 45%;
+    --border: 45 20% 88%;
+    --input: 45 20% 88%;
+    --ring: 160 65% 35%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    /* Sidebar */
-    --sidebar-background: 215 35% 18%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 200 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 35% 25%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 30% 25%;
-    --sidebar-ring: 200 85% 55%;
+    /* Sidebar - Deep Green */
+    --sidebar-background: 160 45% 18%;
+    --sidebar-foreground: 45 30% 95%;
+    --sidebar-primary: 45 95% 55%;
+    --sidebar-primary-foreground: 160 40% 15%;
+    --sidebar-accent: 160 45% 25%;
+    --sidebar-accent-foreground: 45 30% 95%;
+    --sidebar-border: 160 40% 25%;
+    --sidebar-ring: 45 95% 55%;
 
     /* Chart colors */
-    --chart-1: 215 70% 45%;
-    --chart-2: 200 85% 50%;
-    --chart-3: 142 70% 45%;
-    --chart-4: 38 92% 50%;
+    --chart-1: 160 65% 35%;
+    --chart-2: 45 95% 55%;
+    --chart-3: 200 75% 50%;
+    --chart-4: 30 90% 55%;
     --chart-5: 0 72% 51%;
   }
 
   .dark {
-    --background: 215 30% 10%;
-    --foreground: 210 20% 95%;
+    --background: 160 35% 8%;
+    --foreground: 45 30% 95%;
 
-    --card: 215 30% 13%;
-    --card-foreground: 210 20% 95%;
+    --card: 160 35% 11%;
+    --card-foreground: 45 30% 95%;
 
-    --popover: 215 30% 13%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 160 35% 11%;
+    --popover-foreground: 45 30% 95%;
 
-    --primary: 200 85% 55%;
-    --primary-foreground: 215 30% 10%;
+    --primary: 160 60% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 25% 20%;
-    --secondary-foreground: 210 20% 90%;
+    --secondary: 45 90% 50%;
+    --secondary-foreground: 160 40% 10%;
 
-    --muted: 215 25% 18%;
-    --muted-foreground: 215 15% 60%;
+    --muted: 160 30% 15%;
+    --muted-foreground: 45 15% 60%;
 
-    --accent: 200 85% 55%;
-    --accent-foreground: 215 30% 10%;
+    --accent: 200 70% 55%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 70% 45%;
+    --success: 160 60% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --info: 200 85% 55%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 160 40% 10%;
+    --info: 200 70% 55%;
     --info-foreground: 0 0% 100%;
 
-    --border: 215 25% 22%;
-    --input: 215 25% 22%;
-    --ring: 200 85% 55%;
+    --border: 160 30% 20%;
+    --input: 160 30% 20%;
+    --ring: 160 60% 45%;
 
-    --sidebar-background: 215 35% 12%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 200 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 30% 18%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 30% 18%;
-    --sidebar-ring: 200 85% 55%;
+    --sidebar-background: 160 40% 10%;
+    --sidebar-foreground: 45 30% 95%;
+    --sidebar-primary: 45 90% 55%;
+    --sidebar-primary-foreground: 160 40% 10%;
+    --sidebar-accent: 160 35% 16%;
+    --sidebar-accent-foreground: 45 30% 95%;
+    --sidebar-border: 160 35% 16%;
+    --sidebar-ring: 45 90% 55%;
 
-    --chart-1: 200 85% 55%;
-    --chart-2: 215 70% 50%;
-    --chart-3: 142 70% 50%;
-    --chart-4: 38 92% 55%;
+    --chart-1: 160 60% 45%;
+    --chart-2: 45 90% 55%;
+    --chart-3: 200 70% 55%;
+    --chart-4: 30 85% 55%;
     --chart-5: 0 72% 55%;
   }
 }
@@ -136,18 +136,53 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(160 65% 45%) 100%);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(45 100% 60%) 50%, hsl(var(--accent)) 100%);
+  }
+
+  .gradient-sunrise {
+    background: linear-gradient(180deg, hsl(45 95% 70%) 0%, hsl(45 95% 55%) 30%, hsl(200 75% 60%) 100%);
   }
 
   .gradient-sidebar {
-    background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(215 35% 14%) 100%);
+    background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(160 45% 14%) 100%);
   }
 
   .shadow-corporate {
-    box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.1), 0 1px 2px -1px hsl(var(--foreground) / 0.1);
+    box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.08), 0 1px 2px -1px hsl(var(--foreground) / 0.08);
   }
 
   .shadow-corporate-lg {
-    box-shadow: 0 10px 15px -3px hsl(var(--foreground) / 0.1), 0 4px 6px -4px hsl(var(--foreground) / 0.1);
+    box-shadow: 0 10px 25px -5px hsl(var(--foreground) / 0.1), 0 8px 10px -6px hsl(var(--foreground) / 0.08);
   }
+
+  .shadow-glow {
+    box-shadow: 0 0 40px hsl(var(--secondary) / 0.3), 0 0 80px hsl(var(--secondary) / 0.15);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Sun rays animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
