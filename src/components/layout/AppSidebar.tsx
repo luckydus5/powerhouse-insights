@@ -13,9 +13,9 @@ import {
   LogOut,
   ChevronDown,
   Building2,
-  Zap,
   UserCog
 } from 'lucide-react';
+import hqPowerLogo from '@/assets/hq-power-logo.png';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -78,13 +78,11 @@ export function AppSidebar() {
     <Sidebar className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-primary">
-            <Zap className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={hqPowerLogo} alt="HQ Power" className="h-10 w-10 object-contain" />
           {!collapsed && (
             <div className="flex flex-col">
               <span className="font-semibold text-sidebar-foreground">HQ Power</span>
-              <span className="text-xs text-sidebar-foreground/60">Enterprise Dashboard</span>
+              <span className="text-xs text-sidebar-foreground/60">Fleet Management</span>
             </div>
           )}
         </div>
