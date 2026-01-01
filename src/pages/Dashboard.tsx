@@ -14,23 +14,23 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout title="Dashboard">
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-8 animate-fade-in">
         {/* Welcome Section */}
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold text-foreground">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'User'}!
+        <div className="flex flex-col gap-2 pb-2">
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">
+            Welcome back, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'User'}</span>!
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             Here's what's happening across your organization today.
           </p>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {loading ? (
             <>
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 w-full" />
+                <Skeleton key={i} className="h-32 w-full rounded-xl" />
               ))}
             </>
           ) : (
@@ -38,22 +38,26 @@ export default function Dashboard() {
               <KPICard
                 title="Total Reports"
                 value={stats.total}
-                icon={<FileText className="h-5 w-5" />}
+                icon={<FileText className="h-6 w-6" />}
+                variant="blue"
               />
               <KPICard
                 title="Approved"
                 value={stats.approved}
-                icon={<CheckCircle className="h-5 w-5" />}
+                icon={<CheckCircle className="h-6 w-6" />}
+                variant="success"
               />
               <KPICard
                 title="Pending Review"
                 value={stats.pending + stats.inReview}
-                icon={<Clock className="h-5 w-5" />}
+                icon={<Clock className="h-6 w-6" />}
+                variant="gold"
               />
               <KPICard
                 title="Escalated"
                 value={stats.escalated}
-                icon={<AlertTriangle className="h-5 w-5" />}
+                icon={<AlertTriangle className="h-6 w-6" />}
+                variant="warning"
               />
             </>
           )}
