@@ -5,7 +5,6 @@ import {
   Bell,
   LogOut,
   ChevronDown,
-  Zap,
   UserCog,
   Menu,
   X
@@ -25,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import hqPowerLogo from '@/assets/hq-power-logo.png';
 
 export function TopNavbar() {
   const location = useLocation();
@@ -49,9 +49,11 @@ export function TopNavbar() {
       <div className="flex h-16 items-center px-4 md:px-6">
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-3 mr-8">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
-            <Zap className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img 
+            src={hqPowerLogo} 
+            alt="HQ Power" 
+            className="h-10 w-auto"
+          />
           <span className="font-bold text-lg text-foreground hidden sm:block">HQ Power</span>
         </NavLink>
 
@@ -62,9 +64,9 @@ export function TopNavbar() {
               key={item.title}
               to={item.url}
               className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                 isActive(item.url)
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary text-primary-foreground shadow-premium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
@@ -79,9 +81,9 @@ export function TopNavbar() {
               <Button
                 variant="ghost"
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 h-auto text-sm font-medium",
+                  "flex items-center gap-2 px-4 py-2 h-auto text-sm font-medium rounded-lg",
                   departments.some(d => isDepartmentActive(d.code))
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-primary-foreground shadow-premium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -89,7 +91,7 @@ export function TopNavbar() {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-56 bg-popover border-border">
               <DropdownMenuLabel>Select Department</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {departments.map((dept) => (
@@ -112,9 +114,9 @@ export function TopNavbar() {
             <NavLink
               to="/admin"
               className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                 isActive('/admin')
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary text-primary-foreground shadow-premium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
@@ -125,16 +127,16 @@ export function TopNavbar() {
         </nav>
 
         {/* Right side - Notifications & Profile */}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-3 ml-auto">
           {/* Notification Bell */}
           <Button 
             variant="ghost" 
             size="icon"
             onClick={() => navigate('/notifications')}
-            className="relative"
+            className="relative rounded-lg hover:bg-muted"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center font-medium">
               3
             </span>
           </Button>
@@ -142,29 +144,29 @@ export function TopNavbar() {
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 px-2">
-                <Avatar className="h-8 w-8">
+              <Button variant="ghost" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted">
+                <Avatar className="h-9 w-9 border-2 border-primary/20">
                   <AvatarImage src={profile?.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                     {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden lg:flex flex-col items-start">
-                  <span className="text-sm font-medium">{profile?.full_name || 'User'}</span>
+                  <span className="text-sm font-semibold">{profile?.full_name || 'User'}</span>
                   <span className="text-xs text-muted-foreground capitalize">{highestRole}</span>
                 </div>
-                <ChevronDown className="h-4 w-4 hidden lg:block" />
+                <ChevronDown className="h-4 w-4 hidden lg:block text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span>{profile?.full_name || 'User'}</span>
+                  <span className="font-semibold">{profile?.full_name || 'User'}</span>
                   <span className="text-xs font-normal text-muted-foreground">{profile?.email}</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer">
+              <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer focus:text-destructive">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </DropdownMenuItem>
@@ -175,7 +177,7 @@ export function TopNavbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden rounded-lg"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -193,9 +195,9 @@ export function TopNavbar() {
                 to={item.url}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                   isActive(item.url)
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
@@ -209,9 +211,9 @@ export function TopNavbar() {
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                   isActive('/admin')
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
@@ -230,9 +232,9 @@ export function TopNavbar() {
                   to={`/department/${dept.code.toLowerCase()}`}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                     isDepartmentActive(dept.code)
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >

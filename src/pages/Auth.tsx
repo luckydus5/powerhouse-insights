@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Mail, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, Eye, EyeOff, Loader2, Zap, Shield, BarChart3, Users } from 'lucide-react';
 import { z } from 'zod';
 import hqPowerLogo from '@/assets/hq-power-logo.png';
 
@@ -99,33 +99,91 @@ export default function Auth() {
     });
   };
 
+  const features = [
+    { icon: Zap, title: 'Real-time Monitoring', desc: 'Track fleet operations live' },
+    { icon: Shield, title: 'Secure Access', desc: 'Enterprise-grade security' },
+    { icon: BarChart3, title: 'Smart Analytics', desc: 'Data-driven insights' },
+    { icon: Users, title: 'Team Collaboration', desc: 'Cross-department workflow' },
+  ];
+
+  // Shared left panel component
+  const LeftPanel = () => (
+    <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden">
+      {/* Premium Blue Gradient Background */}
+      <div className="absolute inset-0 gradient-hero" />
+      
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-32 right-20 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `linear-gradient(hsl(220 20% 95%) 1px, transparent 1px), linear-gradient(90deg, hsl(220 20% 95%) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }} />
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 w-full">
+        <div className="mb-12">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-secondary/30 rounded-2xl blur-xl animate-pulse-glow" />
+              <img 
+                src={hqPowerLogo} 
+                alt="HQ Power" 
+                className="relative h-20 w-auto drop-shadow-2xl"
+              />
+            </div>
+          </div>
+          <h1 className="text-5xl xl:text-6xl font-bold text-white mb-4 leading-tight">
+            Fleet & Maintenance
+            <span className="block text-gradient-gold">Management System</span>
+          </h1>
+          <p className="text-xl text-white/70 max-w-md">
+            Empowering operational excellence through intelligent fleet management.
+          </p>
+        </div>
+
+        {/* Feature Cards */}
+        <div className="grid grid-cols-2 gap-4 max-w-xl">
+          {features.map((feature, index) => (
+            <div 
+              key={feature.title}
+              className="group p-5 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-secondary/20 text-secondary group-hover:bg-secondary/30 transition-colors">
+                  <feature.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">{feature.title}</h3>
+                  <p className="text-xs text-white/50 mt-0.5">{feature.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   // Email sent confirmation screen
   if (resetEmailSent) {
     return (
       <div className="min-h-screen flex">
-        {/* Left Panel - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-secondary/30 via-transparent to-transparent" />
-          <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center">
-            <img src={hqPowerLogo} alt="HQ Power" className="w-48 h-auto mb-8 drop-shadow-2xl animate-pulse-glow" />
-            <h1 className="text-4xl font-bold text-primary-foreground mb-4">HQ Power</h1>
-            <p className="text-lg text-primary-foreground/80 max-w-md">
-              Powering your fleet operations with intelligent maintenance management
-            </p>
-          </div>
-          {/* Decorative sun rays */}
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-secondary/40 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-tr from-accent/30 to-transparent rounded-full blur-3xl" />
-        </div>
-
-        {/* Right Panel - Content */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        <LeftPanel />
+        <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 sm:p-12 bg-background">
           <div className="w-full max-w-md">
-            <div className="lg:hidden text-center mb-8">
-              <img src={hqPowerLogo} alt="HQ Power" className="w-24 h-auto mx-auto mb-4" />
+            <div className="lg:hidden flex flex-col items-center mb-10">
+              <img src={hqPowerLogo} alt="HQ Power" className="h-16 w-auto mb-4" />
+              <h1 className="text-2xl font-bold text-foreground">HQ Power</h1>
             </div>
 
-            <div className="bg-card rounded-2xl shadow-corporate-lg border border-border/50 p-8 text-center">
+            <div className="bg-card rounded-2xl shadow-premium border-0 p-8 text-center">
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
                 <Mail className="h-8 w-8 text-primary" />
               </div>
@@ -136,7 +194,7 @@ export default function Auth() {
               </p>
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full h-12 rounded-xl"
                 onClick={() => {
                   setShowForgotPassword(false);
                   setResetEmailSent(false);
@@ -157,34 +215,21 @@ export default function Auth() {
   if (showForgotPassword) {
     return (
       <div className="min-h-screen flex">
-        {/* Left Panel - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-secondary/30 via-transparent to-transparent" />
-          <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center">
-            <img src={hqPowerLogo} alt="HQ Power" className="w-48 h-auto mb-8 drop-shadow-2xl animate-pulse-glow" />
-            <h1 className="text-4xl font-bold text-primary-foreground mb-4">HQ Power</h1>
-            <p className="text-lg text-primary-foreground/80 max-w-md">
-              Powering your fleet operations with intelligent maintenance management
-            </p>
-          </div>
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-secondary/40 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-tr from-accent/30 to-transparent rounded-full blur-3xl" />
-        </div>
-
-        {/* Right Panel - Form */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        <LeftPanel />
+        <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 sm:p-12 bg-background">
           <div className="w-full max-w-md">
-            <div className="lg:hidden text-center mb-8">
-              <img src={hqPowerLogo} alt="HQ Power" className="w-24 h-auto mx-auto mb-4" />
+            <div className="lg:hidden flex flex-col items-center mb-10">
+              <img src={hqPowerLogo} alt="HQ Power" className="h-16 w-auto mb-4" />
+              <h1 className="text-2xl font-bold text-foreground">HQ Power</h1>
             </div>
 
-            <div className="bg-card rounded-2xl shadow-corporate-lg border border-border/50 p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-foreground">Reset Password</h2>
-                <p className="text-muted-foreground mt-2">Enter your email to receive a reset link</p>
-              </div>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-foreground mb-2">Reset Password</h2>
+              <p className="text-muted-foreground">Enter your email to receive a reset link</p>
+            </div>
 
-              <form onSubmit={handleForgotPassword} className="space-y-6">
+            <div className="bg-card rounded-2xl shadow-premium border-0 p-6 sm:p-8">
+              <form onSubmit={handleForgotPassword} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                   <Input
@@ -194,16 +239,14 @@ export default function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 rounded-xl border-border/60 focus:border-primary"
+                    className="h-12 bg-muted/50 border-border focus:border-primary rounded-xl"
                   />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 rounded-xl text-base font-semibold bg-primary hover:bg-primary/90 transition-all duration-200" 
+                  className="w-full h-12 rounded-xl text-base font-semibold gradient-primary hover:opacity-90 shadow-glow" 
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -211,9 +254,7 @@ export default function Auth() {
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       Sending...
                     </>
-                  ) : (
-                    'Send Reset Link'
-                  )}
+                  ) : 'Send Reset Link'}
                 </Button>
 
                 <Button
@@ -236,61 +277,26 @@ export default function Auth() {
   // Main login form
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent">
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-secondary/30 via-transparent to-transparent" />
-        
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center">
-          <img 
-            src={hqPowerLogo} 
-            alt="HQ Power" 
-            className="w-56 h-auto mb-8 drop-shadow-2xl animate-pulse-glow" 
-          />
-          <h1 className="text-5xl font-bold text-primary-foreground mb-4 tracking-tight">HQ Power</h1>
-          <p className="text-xl text-primary-foreground/80 max-w-md leading-relaxed">
-            Fleet & Maintenance Management System
-          </p>
-          
-          {/* Features list */}
-          <div className="mt-12 space-y-4 text-left">
-            {[
-              'Real-time fleet monitoring',
-              'Intelligent maintenance scheduling',
-              'Comprehensive audit trails',
-              'Department-level reporting'
-            ].map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 text-primary-foreground/90">
-                <div className="w-2 h-2 rounded-full bg-secondary" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Decorative elements */}
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-secondary/40 to-transparent rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-tr from-accent/30 to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-0 w-64 h-64 bg-gradient-to-l from-secondary/20 to-transparent rounded-full blur-2xl" />
-      </div>
-
+      <LeftPanel />
+      
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 sm:p-12 bg-background">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <img src={hqPowerLogo} alt="HQ Power" className="w-28 h-auto mx-auto mb-4" />
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex flex-col items-center mb-10">
+            <img src={hqPowerLogo} alt="HQ Power" className="h-16 w-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground">HQ Power</h1>
+            <p className="text-sm text-muted-foreground">Fleet Management System</p>
           </div>
 
-          {/* Login card */}
-          <div className="bg-card rounded-2xl shadow-corporate-lg border border-border/50 p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground">Welcome Back</h2>
-              <p className="text-muted-foreground mt-2">Sign in to access your dashboard</p>
-            </div>
+          {/* Welcome Text */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h2>
+            <p className="text-muted-foreground">Sign in to access your dashboard</p>
+          </div>
 
+          {/* Login Card */}
+          <div className="bg-card rounded-2xl shadow-premium border-0 p-6 sm:p-8">
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
@@ -301,11 +307,9 @@ export default function Auth() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 rounded-xl border-border/60 focus:border-primary transition-colors"
+                  className="h-12 bg-muted/50 border-border focus:border-primary rounded-xl"
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -313,7 +317,7 @@ export default function Auth() {
                   <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                   <button
                     type="button"
-                    className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                    className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
                     onClick={() => setShowForgotPassword(true)}
                   >
                     Forgot password?
@@ -327,24 +331,22 @@ export default function Auth() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 rounded-xl border-border/60 focus:border-primary pr-12 transition-colors"
+                    className="h-12 pr-12 bg-muted/50 border-border focus:border-primary rounded-xl"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full h-12 rounded-xl text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 mt-2" 
+                className="w-full h-12 rounded-xl text-base font-semibold gradient-primary hover:opacity-90 transition-opacity shadow-glow"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -352,21 +354,16 @@ export default function Auth() {
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Signing in...
                   </>
-                ) : (
-                  'Sign In'
-                )}
+                ) : 'Sign In'}
               </Button>
             </form>
-
-            <div className="mt-8 pt-6 border-t border-border/50">
-              <p className="text-center text-sm text-muted-foreground">
-                Need access? Contact your system administrator
-              </p>
-            </div>
           </div>
 
           {/* Footer */}
           <p className="text-center text-xs text-muted-foreground mt-8">
+            Need access? Contact your system administrator
+          </p>
+          <p className="text-center text-xs text-muted-foreground mt-4">
             © {new Date().getFullYear()} HQ Power. All rights reserved.
           </p>
         </div>
