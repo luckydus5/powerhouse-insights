@@ -1,11 +1,9 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { KPICard } from '@/components/dashboard/KPICard';
 import { RecentReports } from '@/components/dashboard/RecentReports';
 import { DepartmentAccessCards } from '@/components/dashboard/DepartmentAccessCards';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useReportStats } from '@/hooks/useReportStats';
-import { FileText, CheckCircle, Clock, AlertTriangle, Sparkles } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { FileText, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -52,44 +50,6 @@ export default function Dashboard() {
               </Link>
             </div>
           </div>
-        </div>
-
-        {/* KPI Cards - Compact row */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          {loading ? (
-            <>
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-xl" />
-              ))}
-            </>
-          ) : (
-            <>
-              <KPICard
-                title="Total Reports"
-                value={stats.total}
-                icon={<FileText className="h-5 w-5" />}
-                variant="blue"
-              />
-              <KPICard
-                title="Approved"
-                value={stats.approved}
-                icon={<CheckCircle className="h-5 w-5" />}
-                variant="success"
-              />
-              <KPICard
-                title="Pending Review"
-                value={stats.pending + stats.inReview}
-                icon={<Clock className="h-5 w-5" />}
-                variant="gold"
-              />
-              <KPICard
-                title="Escalated"
-                value={stats.escalated}
-                icon={<AlertTriangle className="h-5 w-5" />}
-                variant="warning"
-              />
-            </>
-          )}
         </div>
 
         {/* Department Access Cards - Main Feature */}
