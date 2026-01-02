@@ -35,7 +35,7 @@ export function TopNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainNavItems = [
-    { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+    { title: 'Home', url: '/', icon: LayoutDashboard },
     { title: 'My Reports', url: '/reports', icon: FileText },
     { title: 'Notifications', url: '/notifications', icon: Bell },
   ];
@@ -109,21 +109,6 @@ export function TopNavbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Admin Link */}
-          {highestRole === 'admin' && (
-            <NavLink
-              to="/admin"
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                isActive('/admin')
-                  ? "bg-primary text-primary-foreground shadow-premium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              <UserCog className="h-4 w-4" />
-              User Management
-            </NavLink>
-          )}
         </nav>
 
         {/* Right side - Notifications & Profile */}
@@ -166,6 +151,15 @@ export function TopNavbar() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {highestRole === 'admin' && (
+                <>
+                  <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer">
+                    <UserCog className="h-4 w-4 mr-2" />
+                    User Management
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer focus:text-destructive">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out

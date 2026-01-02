@@ -64,10 +64,9 @@ export function AppSidebar() {
   const { departments } = useDepartments();
 
   const mainNavItems = [
-    { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+    { title: 'Home', url: '/', icon: LayoutDashboard },
     { title: 'My Reports', url: '/reports', icon: FileText },
     { title: 'Notifications', url: '/notifications', icon: Bell },
-    ...(highestRole === 'admin' ? [{ title: 'User Management', url: '/admin', icon: UserCog }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
