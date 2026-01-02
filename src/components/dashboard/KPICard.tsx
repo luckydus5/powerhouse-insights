@@ -33,15 +33,15 @@ export function KPICard({ title, value, icon, variant = 'default', className }: 
       variantStyles[variant],
       className
     )}>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
-            <p className="text-4xl font-bold text-foreground tracking-tight">{value}</p>
+      <CardContent className="p-4 md:p-5">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+            <p className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{value}</p>
           </div>
           {icon && (
             <div className={cn(
-              "p-3 rounded-xl transition-transform duration-300 group-hover:scale-110",
+              "p-2.5 md:p-3 rounded-xl transition-transform duration-300 group-hover:scale-110",
               iconStyles[variant]
             )}>
               {icon}
